@@ -24,19 +24,31 @@ class SearchController {
     @Get("/find")
     Single<List<Program>> find(HttpRequest request) {
         Map params = getParams(request.getUri().toString())
-        String queryString = queryBuilder(params)
-        BasicDBObject query = BasicDBObject.parse(queryString)
+        String findQueryString = findQueryBuilder(params)
+        String sortQueryString = sortQueryBuilder(params)
+
+        Integer pageSize = params.pageSize.toInteger()
+        Integer pageNumber = params.pageNumber.toInteger()
+
+        BasicDBObject findQuery = BasicDBObject.parse(findQueryString)
+        BasicDBObject sortQuery = BasicDBObject.parse(sortQueryString)
 
         return Flowable.fromPublisher(
-                getCollection().find(query)
+                getCollection()
+                        .find(findQuery)
+                        .skip(pageSize * (pageNumber - 1))
+                        .limit(pageSize)
+                        .sort(sortQuery)
         ).toList()
     }
 
     private MongoCollection<Program> getCollection() {
-        return mongoClient.getDatabase("bbc").getCollection("programs", Program.class)
+        return mongoClient
+                .getDatabase("bbc")
+                .getCollection("programs", Program.class)
     }
 
-    private static String queryBuilder(Map params) {
+    private static String findQueryBuilder(Map params) {
         StringBuilder query = new StringBuilder("{")
 
         if (params?.pid) {
@@ -122,7 +134,21 @@ class SearchController {
         if (params._id) {
             query << "_id:{"
             query <<    "\$oid:\'${params._id}\'"
-            query << "}"
+            query << "},"
+        }
+
+        query << "}"
+
+        return query.toString().trim()
+    }
+
+    private static String sortQueryBuilder(Map params) {
+        StringBuilder query = new StringBuilder("{")
+
+        //ToDo: sort for every detail available
+
+        if (params.order_start_time) {
+            query << "start_time: ${params.order_start_time}"
         }
 
         query << "}"
