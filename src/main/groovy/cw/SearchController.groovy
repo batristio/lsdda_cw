@@ -9,8 +9,6 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.reactivex.Flowable
 import io.reactivex.Single
-import cw.QueryBuilder
-
 import javax.inject.Inject
 
 /**
@@ -22,14 +20,17 @@ class SearchController {
 
     @Inject MongoClient mongoClient
 
+    // FixMe: Question maybe - better to implement one method to handle both document queries & count
+    // FixMe:                  or two methods to separate the logic?
+
     @Get("/find")
     Single<List<Program>> find(HttpRequest request) {
         Map params = getParams(request.getUri().toString())
         String findQueryString = new QueryBuilder().getFindQuery(params)
         String sortQueryString = new QueryBuilder().getSortQuery(params)
 
-        Integer pageSize = params?.pageSize?.toInteger() ?: 10
-        Integer pageNumber = params?.pageNumber?.toInteger() ?: 1
+        Integer pageSize = params?.page_size?.toInteger() ?: 10
+        Integer pageNumber = params?.page_number?.toInteger() ?: 1
 
         BasicDBObject findQuery = BasicDBObject.parse(findQueryString)
         BasicDBObject sortQuery = BasicDBObject.parse(sortQueryString)
@@ -40,6 +41,19 @@ class SearchController {
                         .skip(pageSize * (pageNumber - 1))
                         .limit(pageSize)
                         .sort(sortQuery)
+        ).toList()
+    }
+
+    @Get('/findCount')
+    Single<List<Long>> findCount(HttpRequest request) {
+        Map params = getParams(request.getUri().toString())
+        String findQueryString = new QueryBuilder().getFindQuery(params)
+
+        BasicDBObject findQuery = BasicDBObject.parse(findQueryString)
+
+        return Flowable.fromPublisher(
+                getCollection()
+                    .countDocuments(findQuery)
         ).toList()
     }
 
