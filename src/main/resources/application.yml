@@ -2,6 +2,9 @@
 micronaut:
   application:
     name: cw
+  server:
+    cors:
+      enabled: true
 
 ---
 mongodb:

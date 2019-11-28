@@ -20,9 +20,6 @@ class SearchController {
 
     @Inject MongoClient mongoClient
 
-    // FixMe: Question maybe - better to implement one method to handle both document queries & count
-    // FixMe:                  or two methods to separate the logic?
-
     @Get("/find")
     Single<List<Program>> find(HttpRequest request) {
         Map params = getParams(request.getUri().toString())
@@ -34,6 +31,9 @@ class SearchController {
 
         BasicDBObject findQuery = BasicDBObject.parse(findQueryString)
         BasicDBObject sortQuery = BasicDBObject.parse(sortQueryString)
+
+        println("Find Query --> " + findQueryString)
+        println("Sort Query --> " + sortQueryString)
 
         return Flowable.fromPublisher(
                 getCollection()

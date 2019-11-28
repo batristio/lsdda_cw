@@ -53,27 +53,26 @@ class QueryBuilder {
             query << "},"
         }
 
-
         // %Y-%m-%dT%H:%M:%S.%LZ format to search with
         if (params?.epoch_start_from && params?.epoch_start_to) {
             query << "epoch_start: {"
             query <<    "\$gte:{"
-            query <<        "\$date:${params?.epoch_start_from}"
+            query <<        "\$date:'${params?.epoch_start_from}'"
             query <<    "},"
             query <<    "\$lt:{"
-            query <<        "\$date:${params?.epoch_start_to}"
+            query <<        "\$date:'${params?.epoch_start_to}'"
             query <<    "}"
             query << "},"
         } else if (params?.epoch_start_from) {
             query << "epoch_start: {"
             query <<    "\$gte:{"
-            query <<        "\$date:${params?.epoch_start_from}"
+            query <<        "\$date:'${params?.epoch_start_from}'"
             query <<    "}"
             query << "},"
         } else if (params?.epoch_start_to) {
             query << "epoch_start: {"
             query <<    "\$lte:{"
-            query <<        "\$date:${params?.epoch_start_to}"
+            query <<        "\$date:'${params?.epoch_start_to}'"
             query <<    "}"
             query << "},"
         }
@@ -81,22 +80,22 @@ class QueryBuilder {
         if (params?.epoch_end_from && params?.epoch_end_to) {
             query << "epoch_end: {"
             query <<    "\$gte:{"
-            query <<        "\$date:${params?.epoch_end_from}"
+            query <<        "\$date:'${params?.epoch_end_from}'"
             query <<    "},"
             query <<    "\$lt:{"
-            query <<        "\$date:${params?.epoch_end_to}"
+            query <<        "\$date:'${params?.epoch_end_to}'"
             query <<    "}"
             query << "},"
         } else if (params?.epoch_end_from) {
             query << "epoch_end: {"
             query <<    "\$gte:{"
-            query <<        "\$date:${params?.epoch_end_from}"
+            query <<        "\$date:'${params?.epoch_end_from}'"
             query <<    "}"
             query << "},"
         } else if (params?.epoch_end_to) {
             query << "epoch_end: {"
             query <<    "\$lte:{"
-            query <<        "\$date:${params?.epoch_end_to}"
+            query <<        "\$date:'${params?.epoch_end_to}'"
             query <<    "}"
             query << "},"
         }
