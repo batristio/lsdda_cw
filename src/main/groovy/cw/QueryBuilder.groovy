@@ -101,7 +101,11 @@ class QueryBuilder {
         }
 
         if (params?.complete_title) {
-            query << "complete_title:/${params?.complete_title}/,"
+            String regexifiedName = regexifyAnd(params?.categories)
+
+            query << "complete_title:{"
+            query <<    "\$regex:/${regexifiedName}/,"
+            query << "}"
         }
 
         if (params?.media_type) {
@@ -109,11 +113,19 @@ class QueryBuilder {
         }
 
         if (params?.masterbrand) {
-            query << "masterbrand:/${params?.masterbrand}/,"
+            String regexifiedName = regexifyOr(params?.masterbrand)
+
+            query << "masterbrand:{"
+            query <<    "\$regex:/${regexifiedName}/,"
+            query << "}"
         }
 
         if (params?.service) {
-            query << "service:/${params?.service}/,"
+            String regexifiedName = regexifyOr(params?.service)
+
+            query << "service:{"
+            query <<    "\$regex:/${regexifiedName}/,"
+            query << "}"
         }
 
         if (params?.brand_pid) {
@@ -125,7 +137,7 @@ class QueryBuilder {
         }
 
         if (params?.categories) {
-            String regexifiedName = regexify(params?.categories)
+            String regexifiedName = regexifyAnd(params?.categories)
 
             query << "categories:{"
             query <<    "\$regex: /${regexifiedName}/"
@@ -133,7 +145,7 @@ class QueryBuilder {
         }
 
         if (params?.tags) {
-            String regexifiedName = regexify(params?.tags)
+            String regexifiedName = regexifyAnd(params?.tags)
 
             query << "tags:{"
             query <<    "\$regex: /${regexifiedName}/"
@@ -211,7 +223,7 @@ class QueryBuilder {
         return query.toString().trim()
     }
 
-    private static String regexify(String string) {
+    private static String regexifyAnd(String string) {
         if (!string) return ""
         def regexifiedName = ""
         def namesList = string.replaceAll("\\s","").tokenize(',')
@@ -219,5 +231,17 @@ class QueryBuilder {
             regexifiedName += "(?=.*${currName})"
         }
         return regexifiedName
+    }
+
+    private static String regexifyOr(String string) {
+        if (!string) return ""
+        def regexifiedName = ""
+        def namesList = string.replaceAll("\\s","").tokenize(',')
+        if (namesList.size() == 1) return namesList[0]
+        namesList.each { currName ->
+            regexifiedName += "${currName}|"
+        }
+        def index = regexifiedName.lastIndexOf('|')
+        return regexifiedName.substring(0,index-1)
     }
 }
