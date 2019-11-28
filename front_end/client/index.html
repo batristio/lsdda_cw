@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+        <title>LSDDA CW 16010652</title>
+
+        <!-- Required Stylesheets -->
+        <link type="text/css" rel="stylesheet" href="../lib/bootstrap.min.css">
+        <link type="text/css" rel="stylesheet" href="../lib/bootstrap-vue.css"/>
+        <link type="text/css" rel="stylesheet" href="../lib/bootstrap-datetimepicker.min.css">
+        <link type="text/css" rel="stylesheet" href="../lib/all.min.css">
+        
+        <!-- Load polyfills to support older browsers -->
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"></script>
+        
+        <!-- Required scripts -->
+        <script src="../lib/vue.js"></script>
+        <script src="../lib/moment@2.22.js"></script>
+        <script src="../lib/jquery@3.3.js"></script>
+        <script src="../lib/bootstrap-vue.js"></script>
+        <script src="../lib/axios.js"></script>
+        <script src="../lib/bootstrap-datetimepicker.min.js"></script>
+        <script src="../lib/vue-bootstrap-datetimepicker@5.js"></script>
+        <script>
+            Vue.component('date-picker', VueBootstrapDatetimePicker)
+        </script>
+    </head>
+    <body>
+    <!-- Our application root element -->
+    <div id="app">
+        <b-container>
+
+            <div id="controls" class="mt-2 mb-2">
+                <div>
+                    <b-row>
+                        <b-col lg="12" class="my-1">
+                            <b-button v-b-toggle.collapse variant="primary" >Show/Hide Filters</b-button>
+                            <b-badge class="float-right" variant="info">
+                                <h5 class="my-1">Row count : {{totalRows}}</h5>
+                            </b-badge>
+                        </b-col>
+                    </b-row>
+                </div>
+                <b-collapse visible id="collapse" class="mt-2">
+                    <b-card bg-variant="light">
+                        <b-row>
+                            <!-- PID -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Pid"
+                                    label-cols-sm="4"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="pid"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <b-form-input
+                                            v-model="params.pid"
+                                            type="search"
+                                            id="pid"
+                                            placeholder="Type to Search"
+                                            @change="search()"
+                                        >
+                                        </b-form-input>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                            <!-- START TIME FROM -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Start Time From"
+                                    label-cols-sm="4"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="startTimeFrom"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <date-picker 
+                                            v-model="params.start_time_from"
+                                            :config="options"
+                                            placeholder="Click to select date and time"
+                                            @dp-change="toUnixEpoch(params.start_time_from, 'start_time_from')"
+                                        >
+                                        </date-picker>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                            <!-- START TIME TO -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Start Time To"
+                                    label-cols-sm="5"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="startTimeTo"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <date-picker 
+                                            v-model="params.start_time_to"
+                                            :config="options"
+                                            placeholder="Click to select date and time"
+                                            @dp-change="toUnixEpoch(params.start_time_to, 'start_time_to')"
+                                        >
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                        </b-row>
+                        <b-row>
+                            <!-- END TIME FROM -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="End Time From"
+                                    label-cols-sm="4"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="endTimeFrom"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <date-picker 
+                                            v-model="params.end_time_from"
+                                            :config="options"
+                                            placeholder="Click to select date and time"
+                                            @dp-change="toUnixEpoch(params.end_time_from, 'end_time_from')"
+                                        >
+                                        </date-picker>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                            <!-- END TIME TO -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="End Time To"
+                                    label-cols-sm="4"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="endTimeTo"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <date-picker 
+                                            v-model="params.start_time_to"
+                                            :config="options"
+                                            placeholder="Click to select date and time"
+                                            @dp-change="toUnixEpoch(params.start_time_to, 'start_time_to')"
+                                        >
+                                        </date-picker>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                            <!-- EPOCH START FROM -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Epoch Start From"
+                                    label-cols-sm="5"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="epochStartFrom"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <date-picker 
+                                            v-model="params.epoch_start_from"
+                                            :config="options"
+                                            placeholder="Click to select date and time"
+                                            @dp-change="search()"
+                                        >
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                        </b-row>   
+                        <b-row>
+                            <!-- EPOCH START TO -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Epoch Start To "
+                                    label-cols-sm="4"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="epochStartTo"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <date-picker 
+                                            v-model="params.epoch_start_to"
+                                            :config="options"
+                                            placeholder="Click to select date and time"
+                                            @dp-change="search()"
+                                        >
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                            <!-- EPOCH END FROM -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Epoch End From "
+                                    label-cols-sm="4"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="epochEndFrom"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <date-picker 
+                                            v-model="params.epoch_end_from"
+                                            :config="options"
+                                            placeholder="Click to select date and time"
+                                            @dp-change="search()"
+                                        >
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                            <!-- EPOCH END TO -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Epoch End To "
+                                    label-cols-sm="5"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="epochEndTo"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <date-picker 
+                                            v-model="params.epoch_end_to"
+                                            :config="options"
+                                            placeholder="Click to select date and time"
+                                            @dp-change="search()"
+                                        >
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                        </b-row>   
+                        <b-row>
+                            <!-- COMPLETE TITLE -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Complete Title "
+                                    label-cols-sm="4"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="completeTitle"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <b-form-input
+                                            v-model="params.complete_title"
+                                            type="search"
+                                            id="pid"
+                                            placeholder="Type to Search"
+                                            @change="search()"
+                                        >
+                                        </b-form-input>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                            <!-- MEDIA TYPE -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Media Type"
+                                    label-cols-sm="4"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="mediaType"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <b-form-input
+                                            v-model="params.media_type"
+                                            type="search"
+                                            id="mediaType"
+                                            placeholder="Type to Search"
+                                            @change="search()"
+                                        >
+                                        </b-form-input>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                            <!-- MASTERBRAND -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Masterbrand"
+                                    label-cols-sm="5"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="masterbrand"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <b-form-input
+                                            v-model="params.masterbrand"
+                                            type="search"
+                                            id="masterbrand"
+                                            placeholder="Type to Search"
+                                            @change="search()"
+                                        >
+                                        </b-form-input>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                        </b-row>   
+                        <b-row>
+                            <!-- SERVICE -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Service"
+                                    label-cols-sm="4"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="service"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <b-form-input
+                                            v-model="params.service"
+                                            type="search"
+                                            id="service"
+                                            placeholder="Type to Search"
+                                            @change="search()"
+                                        >
+                                        </b-form-input>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                            <!-- BRAND PID -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Brand Pid"
+                                    label-cols-sm="4"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="brandPid"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <b-form-input
+                                            v-model="params.brand_pid"
+                                            type="search"
+                                            id="mediaTypebrandPid"
+                                            placeholder="Type to Search"
+                                            @change="search()"
+                                        >
+                                        </b-form-input>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                            <!-- IS CLIP -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Is Clip"
+                                    label-cols-sm="5"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="isClip"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <b-form-input
+                                            v-model="params.is_clip"
+                                            type="number"
+                                            id="isClip"
+                                            placeholder="Type to Search"
+                                            @change="search()"
+                                        >
+                                        </b-form-input>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                        </b-row>   
+                        <b-row>
+                            <!-- CATEGORIES -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Categories"
+                                    label-cols-sm="4"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="categories"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <b-form-input
+                                            v-model="params.categories"
+                                            type="search"
+                                            id="categories"
+                                            placeholder="Type to Search"
+                                            @change="search()"
+                                        >
+                                        </b-form-input>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                            <!-- TAGS -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Tags"
+                                    label-cols-sm="4"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="tags"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <b-form-input
+                                            v-model="params.tags"
+                                            type="search"
+                                            id="tags"
+                                            placeholder="Type to Search"
+                                            @change="search()"
+                                        >
+                                        </b-form-input>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                            <!-- PAGE SIZE -->
+                            <b-col lg="4" class="my-1">
+                                <b-form-group
+                                    label="Page Size"
+                                    label-cols-sm="5"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="pageSize"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <b-form-input
+                                            v-model="params.page_size"
+                                            type="number"
+                                            id="pageSize"
+                                            placeholder="Type to Search"
+                                            @change="search()"
+                                        >
+                                        </b-form-input>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                        </b-row>
+                        
+                        <hr/>
+                        
+                        <b-row>
+                            <b-col lg="3" class="my-1">
+                                <b-form-group
+                                    label="Sort Pid"
+                                    label-cols-sm="7"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="sortPid"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="xs">
+                                        <b-form-select 
+                                            v-model="params.order_pid" 
+                                            size="sm"
+                                            id="sortPid"
+                                            class="w-15"
+                                            @input="search()"
+                                        >
+                                            <option :value="1">Asc</option>
+                                            <option :value="-1">Desc</option>
+                                        </b-form-select>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col> 
+                            <b-col lg="3" class="my-1">
+                                <b-form-group
+                                    label="Sort Start Time"
+                                    label-cols-sm="7"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="sortStartTime"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="xs">
+                                        <b-form-select 
+                                            v-model="params.order_start_time" 
+                                            size="sm"
+                                            id="sortStartTime"
+                                            class="w-25"
+                                            @input="search()"
+                                        >
+                                            <option :value="1">Asc</option>
+                                            <option :value="-1">Desc</option>
+                                        </b-form-select>
+                                    </b-input-group>
+                                </b-form-group>    
+                            </b-col>
+                            <b-col lg="3" class="my-1">
+                                <b-form-group
+                                    label="Sort End Time"
+                                    label-cols-sm="7"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="sortEndTime"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="xs">
+                                        <b-form-select 
+                                            v-model="params.order_end_time" 
+                                            size="sm"
+                                            id="sortEndTime"
+                                            class="w-25"
+                                            @input="search()"
+                                        >
+                                            <option :value="1">Asc</option>
+                                            <option :value="-1">Desc</option>
+                                        </b-form-select>
+                                    </b-input-group>
+                                </b-form-group>    
+                            </b-col>
+                            <b-col lg="3" class="my-1">
+                                <b-form-group
+                                    label="Sort Epoch Start Time"
+                                    label-cols-sm="7"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="sortEpochStartTime"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="xs">
+                                        <b-form-select 
+                                            v-model="params.order_epoch_start_time"
+                                            size="sm"
+                                            id="sortEpochStartTime"
+                                            class="w-25"
+                                            @input="search()"
+                                        >
+                                            <option :value="1">Asc</option>
+                                            <option :value="-1">Desc</option>
+                                        </b-form-select>
+                                    </b-input-group>
+                                </b-form-group>    
+                            </b-col>                        
+                        </b-row>
+                        <b-row>
+                            <b-col lg="3" class="my-1">
+                                <b-form-group
+                                    label="Sort Epoch End Time"
+                                    label-cols-sm="7"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="sortEpochEnd"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="xs">
+                                        <b-form-select 
+                                            v-model="params.order_epoch_end"
+                                            size="sm"
+                                            id="sortEpochEnd"
+                                            class="w-15"
+                                            @input="search()"
+                                        >
+                                            <option :value="1">Asc</option>
+                                            <option :value="-1">Desc</option>
+                                        </b-form-select>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col> 
+                            <b-col lg="3" class="my-1">
+                                <b-form-group
+                                    label="Sort Complete Title"
+                                    label-cols-sm="7"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="sortCompleteTitle"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="xs">
+                                        <b-form-select 
+                                            v-model="params.order_complete_title"
+                                            size="sm"
+                                            id="sortCompleteTitle"
+                                            class="w-15"
+                                            @input="search()"
+                                        >
+                                            <option :value="1">Asc</option>
+                                            <option :value="-1">Desc</option>
+                                        </b-form-select>
+                                    </b-input-group>
+                                </b-form-group> 
+                            </b-col>
+                            <b-col lg="3" class="my-1">
+                                <b-form-group
+                                    label="Sort Media Type"
+                                    label-cols-sm="7"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="sortMediaType"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="xs">
+                                        <b-form-select 
+                                            v-model="params.order_media_type" 
+                                            size="sm"
+                                            id="sortMediaType"
+                                            class="w-25"
+                                            @input="search()"
+                                        >
+                                            <option :value="1">Asc</option>
+                                            <option :value="-1">Desc</option>
+                                        </b-form-select>
+                                    </b-input-group>
+                                </b-form-group>    
+                            </b-col>
+                            <b-col lg="3" class="my-1">
+                                <b-form-group
+                                    label="Sort Masterbrand"
+                                    label-cols-sm="7"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="sortMasterbrand"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="xs">
+                                        <b-form-select 
+                                            v-model="params.order_masterbrand"
+                                            size="sm"
+                                            id="sortMasterbrand"
+                                            class="w-25"
+                                            @input="search()"
+                                        >
+                                            <option :value="1">Asc</option>
+                                            <option :value="-1">Desc</option>
+                                        </b-form-select>
+                                    </b-input-group>
+                                </b-form-group>    
+                            </b-col>                        
+                        </b-row>
+                        <b-row>
+                            <b-col lg="3" class="my-1">
+                                <b-form-group
+                                    label="Sort Service"
+                                    label-cols-sm="7"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="sortService"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="xs">
+                                        <b-form-select 
+                                            v-model="params.order_service" 
+                                            size="sm"
+                                            id="sortService"
+                                            class="w-15"
+                                            @input="search()"
+                                        >
+                                            <option :value="1">Asc</option>
+                                            <option :value="-1">Desc</option>
+                                        </b-form-select>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col> 
+                            <b-col lg="3" class="my-1">
+                                <b-form-group
+                                    label="Sort Brand Pid"
+                                    label-cols-sm="7"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="sortBrandPid"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="xs">
+                                        <b-form-select 
+                                            v-model="params.order_brand_pid" 
+                                            size="sm"
+                                            id="sortBrandPid"
+                                            class="w-25"
+                                            @input="search()"
+                                        >
+                                            <option :value="1">Asc</option>
+                                            <option :value="-1">Desc</option>
+                                        </b-form-select>
+                                    </b-input-group>
+                                </b-form-group>    
+                            </b-col>
+                            <b-col lg="3" class="my-1">
+                                <b-form-group
+                                    label="Sort Is Clip"
+                                    label-cols-sm="7"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="sortIsClip"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="xs">
+                                        <b-form-select 
+                                            v-model="params.order_is_clip" 
+                                            size="sm"
+                                            id="sortIsClip"
+                                            class="w-25"
+                                            @input="search()"
+                                        >
+                                            <option :value="1">Asc</option>
+                                            <option :value="-1">Desc</option>
+                                        </b-form-select>
+                                    </b-input-group>
+                                </b-form-group>    
+                            </b-col>
+                            <b-col lg="3" class="my-1">
+                                <b-form-group
+                                    label="Sort Categories"
+                                    label-cols-sm="7"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="sortCategories"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="xs">
+                                        <b-form-select 
+                                            v-model="params.order_categories"
+                                            size="sm"
+                                            id="sortCategories"
+                                            class="w-25"
+                                            @input="search()"
+                                        >
+                                            <option :value="1">Asc</option>
+                                            <option :value="-1">Desc</option>
+                                        </b-form-select>
+                                    </b-input-group>
+                                </b-form-group>    
+                            </b-col>       
+                            <b-col lg="3" class="my-1">
+                                <b-form-group
+                                    label="Sort Tags"
+                                    label-cols-sm="7"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="sortTags"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="xs">
+                                        <b-form-select 
+                                            v-model="params.order_tags"
+                                            size="sm"
+                                            id="sortTags"
+                                            class="w-25"
+                                            @input="search()"
+                                        >
+                                            <option :value="1">Asc</option>
+                                            <option :value="-1">Desc</option>
+                                        </b-form-select>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>                 
+                        </b-row>    
+                        
+                        <hr/>
+                        
+                        <!-- ToDo: add checkboxes to disable columns -->
+
+                        <b-form-group label="Show/Hide Columns">
+                            <b-row>
+                                <b-col lg="2" class="my-1">
+                                    <b-form-checkbox id="columnPid" v-model="showColumns.pid" value="1" @change="toggleColumn(toggle.pid)">
+                                        Pid
+                                    </b-form-checkbox>  
+                                </b-col>
+                                <b-col lg="2" class="my-1">
+                                    <b-form-checkbox id="columnStartTime" v-model="showColumns.startTime" value="1" @change="toggleColumn(toggle.startTime)">
+                                        Start Time
+                                    </b-form-checkbox>
+                                </b-col>
+                                <b-col lg="2" class="my-1">
+                                    <b-form-checkbox id="columnEndTime" v-model="showColumns.endTime" value="1" @change="toggleColumn(toggle.endTime)">
+                                        End Time
+                                    </b-form-checkbox>
+                                </b-col>
+                                <b-col lg="2" class="my-1">
+                                    <b-form-checkbox id="columnEpochStart" v-model="showColumns.epochStart" value="1" @change="toggleColumn(toggle.epochStart)">
+                                        Epoch Start
+                                    </b-form-checkbox>         
+                                </b-col>
+                                <b-col lg="2" class="my-1">                                                                        
+                                    <b-form-checkbox id="columnEpochEnd" v-model="showColumns.epochEnd" value="1" @change="toggleColumn(toggle.epochEnd)">
+                                        Epoch End
+                                    </b-form-checkbox>   
+                                </b-col> 
+                                <b-col lg="2" class="my-1">
+                                    <b-form-checkbox id="columnCompleteTitle" v-model="showColumns.completeTitle" value="1" @change="toggleColumn(toggle.completeTitle)">
+                                        Complete Title
+                                    </b-form-checkbox>       
+                                </b-col>
+                            </b-row>
+                            <b-row>
+                                <b-col lg="2" class="my-1">
+                                    <b-form-checkbox id="columnMediaType" v-model="showColumns.mediaType" value="1" @change="toggleColumn(toggle.mediaType)">
+                                        Media Type
+                                    </b-form-checkbox>
+                                </b-col>
+                                <b-col lg="2" class="my-1">
+                                    <b-form-checkbox id="columnMasterbrand" v-model="showColumns.masterbrand" value="1" @change="toggleColumn(toggle.masterbrand)">
+                                        Masterbrand
+                                    </b-form-checkbox>
+                                </b-col>
+                                <b-col lg="2" class="my-1">
+                                    <b-form-checkbox id="columnService" v-model="showColumns.service" value="1" @change="toggleColumn(toggle.service)">
+                                        Service
+                                    </b-form-checkbox>
+                                </b-col>
+                                <b-col lg="2" class="my-1">
+                                    <b-form-checkbox id="columnBrandPid" v-model="showColumns.brandPid" value="1" @change="toggleColumn(toggle.brandPid)">
+                                        Brand Pid
+                                    </b-form-checkbox>
+                                </b-col>
+                                <b-col lg="2" class="my-1">
+                                    <b-form-checkbox id="columnIsClip" v-model="showColumns.isClip" value="1" @change="toggleColumn(toggle.isClip)">
+                                        Is Clip
+                                    </b-form-checkbox>
+                                </b-col>
+                                <b-col lg="2" class="my-1">
+                                    <b-form-checkbox id="columnCategories" v-model="showColumns.categories" value="1" @change="toggleColumn(toggle.categories)">
+                                        Categories
+                                    </b-form-checkbox>
+                                </b-col>
+                            </b-row>
+                            <b-row>
+                                <b-col lg="2" class="my-1">
+                                    <b-form-checkbox id="columnTags" v-model="showColumns.tags" value="1" @change="toggleColumn(toggle.tags)">
+                                        Tags
+                                    </b-form-checkbox>
+                                </b-col>
+                            </b-row>                 
+                        </b-form-group>
+
+                    </b-card>
+                </b-collapse>
+            </div>
+            <div class="mb-2 mt-2">
+                <b-card bg-variant="light" class="mb-5">
+                    <b-table 
+                        striped
+                        responsive 
+                        hover 
+                        :fields="fields" 
+                        :items="results"
+                    >
+                    </b-table>
+                    <b-col lg=12 class="my-1">
+                        <b-pagination
+                            v-model="params.page_number"
+                            :total-rows="totalRows"
+                            :per-page="params.page_size"
+                            align="center"
+                            size="md"
+                            limit="10"
+                            class="my-0"
+                            @input="newPage"
+                        ></b-pagination>
+                    </b-col>
+                </b-card>
+            </div>
+        </b-container>
+    </div>
+
+    <!-- Start running your app -->
+    <script>
+
+        // enable icons for the date-picker
+        $.extend(true, jQuery.fn.datetimepicker.defaults, {
+            icons: {
+                time: 'far fa-clock',
+                date: 'far fa-calendar',
+                up: 'fas fa-arrow-up',
+                down: 'fas fa-arrow-down',
+                previous: 'fas fa-chevron-left',
+                next: 'fas fa-chevron-right',
+                today: 'fas fa-calendar-check',
+                clear: 'far fa-trash-alt',
+                close: 'far fa-times-circle'
+            }
+        });
+
+        const app = new Vue({
+            el: '#app',
+            data: {
+                fields: [
+                    'pid', 'startTime', 'endTime',
+                    'epochStart','epochEnd','completeTitle',
+                    'mediaType','masterbrand','service',
+                    'brandPid','isClip','categories','tags',
+                ],
+                results: [],
+                params: {
+                    // for values
+                    pid:"",start_time_from:"",start_time_to:"",end_time_from:"",
+                    end_time_to:"",epoch_start_from:"",epoch_start_to:"",epoch_end_from:"",
+                    epoch_end_to:"",complete_title:"",media_type:"",masterbrand:"",service:"",
+                    brand_pid:"",is_clip:"",categories:"",tags:"",page_size:10,page_number: 1,
+                    
+                    // for ordering
+                    order_pid:"",order_end_time:"",order_start_time:"",order_epoch_end:"",
+                    order_epoch_start:"",order_media_type:"",order_masterbrand:"",
+                    order_service:"",order_brand_pid:"",order_is_clip:"",
+                    order_categories:"",order_tags:"",order_complete_title:""
+                },
+                totalRows:null,
+                parameterString:"",
+                baseUrl:"http://localhost:8080/",
+                methodCount:"findCount?",
+                methodFind:"find?",
+                dismissed:3,
+                date: null,
+                options: {
+                    format: "YYYY-MM-DDTHH:mm:ss[Z]",
+                    useCurrent: false,
+                    showClear: true,
+                    showClose: true,
+                    timeZone:'UTC'
+                },
+                showColumns:{
+                    pid:1, startTime:1, endTime:1,
+                    epochStart:1,epochEnd:1,completeTitle:1,
+                    mediaType:1,masterbrand:1,service:1,
+                    brandPid:1,isClip:1,categories:1,tags:1
+                },
+                toggle:{
+                    pid:1, startTime:2, endTime:3,
+                    epochStart:4,epochEnd:5,completeTitle:6,
+                    mediaType:7,masterbrand:8,service:9,
+                    brandPid:10,isClip:11,categories:12,tags:13
+                },
+            },
+            methods: {
+                countForPagination() {
+                    axios.get(this.baseUrl + this.methodCount + this.parameterString).then(response => {
+                        this.totalRows = response.data[0]
+                        this.showToast(response.data[0])
+                    })
+                },
+                search() {
+                    this.populateParams()
+                    axios.get(this.baseUrl + this.methodFind + this.parameterString).then(response => {
+                        this.results = response.data
+                    })
+                    this.countForPagination()
+                    // console.log(this.parameterString.split('&'))
+                    // console.log("================================")
+                },
+                populateParams() {
+                    this.parameterString = ""
+                    for (element in this.params) {
+                        if (this.params[element] == null) this.params[element] == ""
+                        this.parameterString += element + "=" + this.params[element] + "&"
+                    }
+                },
+                showToast(rows) {
+                    // this.$bvToast.toast('Found ' + rows + ' rows', {
+                    //     title: 'Alert',
+                    //     autoHideDelay: 1500,
+                    //     appendToast: false,
+                    //     variant:'success'
+                    // })
+                },
+                toUnixEpoch(date, paramName) {
+                    date == null ? date = "" : date = new Date(date).getTime()/1000
+                    this.params[paramName] = date.toString()
+                    this.search()
+                },
+                toggleColumn(index) {
+                    console.log(index)
+                    let column = document.querySelectorAll(`[aria-colindex='${index}']`)
+                    for (var element of column) {
+                        if (element.className == "d-none") {
+                            element.classList.remove("d-none")
+                        } else {
+                            element.classList.add("d-none")
+                        }
+                    }
+                },
+
+            },
+            mounted() {
+                this.countForPagination()
+                this.populateParams()
+            },
+            computed: {
+                newPage() {
+                    this.populateParams()
+                    axios.get(this.baseUrl + this.methodFind + this.parameterString).then(response => {
+                        this.results = response.data
+                    })
+                }
+            }
+      })
+        </script>
+    </body>
+</html>
