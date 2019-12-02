@@ -26,14 +26,14 @@ class SearchController {
         String findQueryString = new QueryBuilder().getFindQuery(params)
         String sortQueryString = new QueryBuilder().getSortQuery(params)
 
-        Integer pageSize = params?.page_size?.toInteger() ?: 10
+        Integer pageSize = params?.page_size?.toInteger() ?: 5
         Integer pageNumber = params?.page_number?.toInteger() ?: 1
 
         BasicDBObject findQuery = BasicDBObject.parse(findQueryString)
         BasicDBObject sortQuery = BasicDBObject.parse(sortQueryString)
 
-        println("Find Query --> " + findQueryString)
-        println("Sort Query --> " + sortQueryString)
+        println("Find Query --> db.programs.find(${findQueryString})")
+        println("Sort Query --> db.programs.sort(${sortQueryString})")
 
         return Flowable.fromPublisher(
                 getCollection()
@@ -50,6 +50,8 @@ class SearchController {
         String findQueryString = new QueryBuilder().getFindQuery(params)
 
         BasicDBObject findQuery = BasicDBObject.parse(findQueryString)
+
+        println("Count Query -> db.programs.find(${findQueryString}).count()")
 
         return Flowable.fromPublisher(
                 getCollection()

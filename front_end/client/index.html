@@ -435,7 +435,7 @@
                                             type="number"
                                             id="pageSize"
                                             placeholder="Type to Search"
-                                            @change="search()"
+                                            @input="search()"
                                         >
                                         </b-form-input>
                                     </b-input-group>
@@ -842,18 +842,22 @@
                         :items="results"
                     >
                     </b-table>
-                    <b-col lg=12 class="my-1">
-                        <b-pagination
-                            v-model="params.page_number"
-                            :total-rows="totalRows"
-                            :per-page="params.page_size"
-                            align="center"
-                            size="md"
-                            limit="10"
-                            class="my-0"
-                            @input="newPage"
-                        ></b-pagination>
-                    </b-col>
+                    <!-- ToDo: Search for null values -->
+                    <!-- ToDo: display just 5 results per page -->
+                    <div :class="[this.paginationIsShown ? '' : 'd-none']">
+                        <b-col lg=12 class="my-1">
+                            <b-pagination
+                                v-model="params.page_number"
+                                :total-rows="totalRows"
+                                :per-page="params.page_size"
+                                align="center"
+                                size="md"
+                                limit="10"
+                                class="my-0"
+                                @input="newPage"
+                            ></b-pagination>
+                        </b-col>
+                    </div>
                 </b-card>
             </div>
         </b-container>
@@ -892,7 +896,7 @@
                     pid:"",start_time_from:"",start_time_to:"",end_time_from:"",
                     end_time_to:"",epoch_start_from:"",epoch_start_to:"",epoch_end_from:"",
                     epoch_end_to:"",complete_title:"",media_type:"",masterbrand:"",service:"",
-                    brand_pid:"",is_clip:"",categories:"",tags:"",page_size:10,page_number: 1,
+                    brand_pid:"",is_clip:"",categories:"",tags:"",page_size:5,page_number: 1,
                     
                     // for ordering
                     order_pid:"",order_end_time:"",order_start_time:"",order_epoch_end:"",
@@ -926,12 +930,14 @@
                     mediaType:7,masterbrand:8,service:9,
                     brandPid:10,isClip:11,categories:12,tags:13
                 },
+                paginationIsShown: null
             },
             methods: {
                 countForPagination() {
                     axios.get(this.baseUrl + this.methodCount + this.parameterString).then(response => {
                         this.totalRows = response.data[0]
-                        this.showToast(response.data[0])
+                        this.paginationIsShown = this.totalRows >= 5 ? true : false
+                        // this.showToast(response.data[0])
                     })
                 },
                 search() {
@@ -940,8 +946,8 @@
                         this.results = response.data
                     })
                     this.countForPagination()
-                    // console.log(this.parameterString.split('&'))
-                    // console.log("================================")
+                    console.log(this.parameterString.split('&'))
+                    console.log("================================")
                 },
                 populateParams() {
                     this.parameterString = ""
@@ -950,22 +956,21 @@
                         this.parameterString += element + "=" + this.params[element] + "&"
                     }
                 },
-                showToast(rows) {
-                    // this.$bvToast.toast('Found ' + rows + ' rows', {
-                    //     title: 'Alert',
-                    //     autoHideDelay: 1500,
-                    //     appendToast: false,
-                    //     variant:'success'
-                    // })
-                },
+                /*showToast(rows) {
+                    this.$bvToast.toast('Found ' + rows + ' rows', {
+                        title: 'Alert',
+                        autoHideDelay: 1500,
+                        appendToast: false,
+                        variant:'success'
+                    })
+                },*/
                 toUnixEpoch(date, paramName) {
                     date == null ? date = "" : date = new Date(date).getTime()/1000
                     this.params[paramName] = date.toString()
                     this.search()
                 },
                 toggleColumn(index) {
-                    console.log(index)
-                    let column = document.querySelectorAll(`[aria-colindex='${index}']`)
+                        let column = document.querySelectorAll(`[aria-colindex='${index}']`)
                     for (var element of column) {
                         if (element.className == "d-none") {
                             element.classList.remove("d-none")
@@ -974,11 +979,11 @@
                         }
                     }
                 },
-
             },
             mounted() {
                 this.countForPagination()
                 this.populateParams()
+                this.search()
             },
             computed: {
                 newPage() {

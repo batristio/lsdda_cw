@@ -101,7 +101,7 @@ class QueryBuilder {
         }
 
         if (params?.complete_title) {
-            String regexifiedName = regexifyAnd(params?.categories)
+            String regexifiedName = regexifyAnd(params?.complete_title)
 
             query << "complete_title:{"
             query <<    "\$regex:/${regexifiedName}/,"
