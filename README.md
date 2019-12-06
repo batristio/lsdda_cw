@@ -1,6 +1,7 @@
 # lsdda_cw
 
-* Just need to have a mongodb running on <b>localhost:27017</b>
+* Mongodb running on <b>localhost:27017</b>
+* Micronaut (back_end) running on port 8080
 * Database name is '<b>bbc</b>'
 * Collection name is <b>'programs'</b>
 ---
