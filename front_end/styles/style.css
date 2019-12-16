@@ -1,0 +1,10 @@
+/* Force the table contents not to wrap */
+tr th,
+tr td {
+    white-space: nowrap;
+}
+
+/* Different hover color for the table */
+.table-hover tbody tr:hover {
+    background-color: #fff3cd99;
+}

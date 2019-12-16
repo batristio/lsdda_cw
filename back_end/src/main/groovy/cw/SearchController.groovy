@@ -26,8 +26,10 @@ class SearchController {
         String findQueryString = new QueryBuilder().getFindQuery(params)
         String sortQueryString = new QueryBuilder().getSortQuery(params)
 
-        Integer pageSize = params?.page_size?.toInteger() ?: 5
+        Integer pageSize = params?.limit?.toInteger() ?: 10
         Integer pageNumber = params?.page_number?.toInteger() ?: 1
+
+        //ToDo: Deploy on AWS ^
 
         BasicDBObject findQuery = BasicDBObject.parse(findQueryString)
         BasicDBObject sortQuery = BasicDBObject.parse(sortQueryString)
@@ -38,7 +40,6 @@ class SearchController {
         return Flowable.fromPublisher(
                 getCollection()
                         .find(findQuery)
-                        .skip(pageSize * (pageNumber - 1))
                         .limit(pageSize)
                         .sort(sortQuery)
         ).toList()

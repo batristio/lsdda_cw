@@ -100,7 +100,12 @@ class QueryBuilder {
             query << "},"
         }
 
-        if (params?.complete_title) {
+        if (params?.complete_title == "null") {
+            query << "complete_title:{"
+            query <<    "\$eq:'',"
+            query << "}"
+
+        } else if (params?.complete_title) {
             String regexifiedName = regexifyAnd(params?.complete_title)
 
             query << "complete_title:{"
@@ -112,7 +117,12 @@ class QueryBuilder {
             query << "media_type:/${params?.media_type}/,"
         }
 
-        if (params?.masterbrand) {
+        if (params?.masterbrand == "null") {
+            query << "masterbrand:{"
+            query <<    "\$eq:'',"
+            query << "}"
+
+        } else if (params?.masterbrand) {
             String regexifiedName = regexifyOr(params?.masterbrand)
 
             query << "masterbrand:{"
@@ -120,7 +130,12 @@ class QueryBuilder {
             query << "}"
         }
 
-        if (params?.service) {
+        if (params?.service == "null") {
+            query << "service:{"
+            query <<    "\$eq:'',"
+            query << "}"
+
+        } else if (params?.service) {
             String regexifiedName = regexifyOr(params?.service)
 
             query << "service:{"
@@ -128,7 +143,12 @@ class QueryBuilder {
             query << "}"
         }
 
-        if (params?.brand_pid) {
+        if (params?.brand_pid == "null") {
+            query << "brand_pid:{"
+            query <<    "\$eq:'',"
+            query << "}"
+
+        } else if (params?.brand_pid) {
             query << "brand_pid:/${params?.brand_pid}/,"
         }
 
@@ -136,7 +156,12 @@ class QueryBuilder {
             query << "is_clip:${params?.is_clip},"
         }
 
-        if (params?.categories) {
+        if (params?.categories == "null") {
+            query << "categories:{"
+            query <<    "\$eq:'[]',"
+            query << "}"
+
+        } else if (params?.categories) {
             String regexifiedName = regexifyAnd(params?.categories)
 
             query << "categories:{"
@@ -144,7 +169,12 @@ class QueryBuilder {
             query << "},"
         }
 
-        if (params?.tags) {
+        if (params?.tags == "null") {
+            query << "tags:{"
+            query <<    "\$eq:'[]',"
+            query << "}"
+
+        } else if (params?.tags) {
             String regexifiedName = regexifyAnd(params?.tags)
 
             query << "tags:{"

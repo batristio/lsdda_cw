@@ -9,10 +9,11 @@
         <title>LSDDA CW 16010652</title>
 
         <!-- Required Stylesheets -->
-        <link type="text/css" rel="stylesheet" href="../lib/bootstrap.min.css">
+        <link type="text/css" rel="stylesheet" href="../lib/bootstrap.min.css"/>
         <link type="text/css" rel="stylesheet" href="../lib/bootstrap-vue.css"/>
-        <link type="text/css" rel="stylesheet" href="../lib/bootstrap-datetimepicker.min.css">
-        <link type="text/css" rel="stylesheet" href="../lib/all.min.css">
+        <link type="text/css" rel="stylesheet" href="../lib/bootstrap-datetimepicker.min.css"/>
+        <link type="text/css" rel="stylesheet" href="../lib/all.min.css"/>
+        <link type="text/css" rel="stylesheet" href="../styles/style.css"/>
         
         <!-- Load polyfills to support older browsers -->
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"></script>
@@ -37,10 +38,17 @@
             <div id="controls" class="mt-2 mb-2">
                 <div>
                     <b-row>
-                        <b-col lg="12" class="my-1">
+                        <b-col xs="2" class="my-1">
                             <b-button v-b-toggle.collapse variant="primary" >Show/Hide Filters</b-button>
+                        </b-col>
+                        <b-col xs="2" class="my-1 offset-xs-3 text-center">
+                            <b-badge  variant="info">
+                                <h5 class="my-1">Limit : {{params.limit}}</h5>
+                            </b-badge>        
+                        </b-col>
+                        <b-col xs="2" class="my-1 offset-xs-3">
                             <b-badge class="float-right" variant="info">
-                                <h5 class="my-1">Row count : {{totalRows}}</h5>
+                                <h5 class="my-1">Total row count : {{totalRows}}</h5>
                             </b-badge>
                         </b-col>
                     </b-row>
@@ -49,7 +57,7 @@
                     <b-card bg-variant="light">
                         <b-row>
                             <!-- PID -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Pid"
                                     label-cols-sm="4"
@@ -64,14 +72,14 @@
                                             type="search"
                                             id="pid"
                                             placeholder="Type to Search"
-                                            @change="search()"
+                                            @change="populateParams()"
                                         >
                                         </b-form-input>
                                     </b-input-group>
                                 </b-form-group>
                             </b-col>
                             <!-- START TIME FROM -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Start Time From"
                                     label-cols-sm="4"
@@ -92,7 +100,7 @@
                                 </b-form-group>
                             </b-col>
                             <!-- START TIME TO -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Start Time To"
                                     label-cols-sm="5"
@@ -114,7 +122,7 @@
                         </b-row>
                         <b-row>
                             <!-- END TIME FROM -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="End Time From"
                                     label-cols-sm="4"
@@ -135,7 +143,7 @@
                                 </b-form-group>
                             </b-col>
                             <!-- END TIME TO -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="End Time To"
                                     label-cols-sm="4"
@@ -156,7 +164,7 @@
                                 </b-form-group>
                             </b-col>
                             <!-- EPOCH START FROM -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Epoch Start From"
                                     label-cols-sm="5"
@@ -170,7 +178,7 @@
                                             v-model="params.epoch_start_from"
                                             :config="options"
                                             placeholder="Click to select date and time"
-                                            @dp-change="search()"
+                                            @dp-change="populateParams()"
                                         >
                                     </b-input-group>
                                 </b-form-group>
@@ -178,7 +186,7 @@
                         </b-row>   
                         <b-row>
                             <!-- EPOCH START TO -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Epoch Start To "
                                     label-cols-sm="4"
@@ -192,13 +200,13 @@
                                             v-model="params.epoch_start_to"
                                             :config="options"
                                             placeholder="Click to select date and time"
-                                            @dp-change="search()"
+                                            @dp-change="populateParams()"
                                         >
                                     </b-input-group>
                                 </b-form-group>
                             </b-col>
                             <!-- EPOCH END FROM -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Epoch End From "
                                     label-cols-sm="4"
@@ -212,13 +220,13 @@
                                             v-model="params.epoch_end_from"
                                             :config="options"
                                             placeholder="Click to select date and time"
-                                            @dp-change="search()"
+                                            @dp-change="populateParams()"
                                         >
                                     </b-input-group>
                                 </b-form-group>
                             </b-col>
                             <!-- EPOCH END TO -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Epoch End To "
                                     label-cols-sm="5"
@@ -232,7 +240,7 @@
                                             v-model="params.epoch_end_to"
                                             :config="options"
                                             placeholder="Click to select date and time"
-                                            @dp-change="search()"
+                                            @dp-change="populateParams()"
                                         >
                                     </b-input-group>
                                 </b-form-group>
@@ -240,7 +248,7 @@
                         </b-row>   
                         <b-row>
                             <!-- COMPLETE TITLE -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Complete Title "
                                     label-cols-sm="4"
@@ -255,14 +263,14 @@
                                             type="search"
                                             id="pid"
                                             placeholder="Type to Search"
-                                            @change="search()"
+                                            @change="populateParams()"
                                         >
                                         </b-form-input>
                                     </b-input-group>
                                 </b-form-group>
                             </b-col>
                             <!-- MEDIA TYPE -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Media Type"
                                     label-cols-sm="4"
@@ -277,14 +285,14 @@
                                             type="search"
                                             id="mediaType"
                                             placeholder="Type to Search"
-                                            @change="search()"
+                                            @change="populateParams()"
                                         >
                                         </b-form-input>
                                     </b-input-group>
                                 </b-form-group>
                             </b-col>
                             <!-- MASTERBRAND -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Masterbrand"
                                     label-cols-sm="5"
@@ -299,7 +307,7 @@
                                             type="search"
                                             id="masterbrand"
                                             placeholder="Type to Search"
-                                            @change="search()"
+                                            @change="populateParams()"
                                         >
                                         </b-form-input>
                                     </b-input-group>
@@ -308,7 +316,7 @@
                         </b-row>   
                         <b-row>
                             <!-- SERVICE -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Service"
                                     label-cols-sm="4"
@@ -323,14 +331,14 @@
                                             type="search"
                                             id="service"
                                             placeholder="Type to Search"
-                                            @change="search()"
+                                            @change="populateParams()"
                                         >
                                         </b-form-input>
                                     </b-input-group>
                                 </b-form-group>
                             </b-col>
                             <!-- BRAND PID -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Brand Pid"
                                     label-cols-sm="4"
@@ -345,14 +353,14 @@
                                             type="search"
                                             id="mediaTypebrandPid"
                                             placeholder="Type to Search"
-                                            @change="search()"
+                                            @change="populateParams()"
                                         >
                                         </b-form-input>
                                     </b-input-group>
                                 </b-form-group>
                             </b-col>
                             <!-- IS CLIP -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Is Clip"
                                     label-cols-sm="5"
@@ -367,7 +375,7 @@
                                             type="number"
                                             id="isClip"
                                             placeholder="Type to Search"
-                                            @change="search()"
+                                            @change="populateParams()"
                                         >
                                         </b-form-input>
                                     </b-input-group>
@@ -376,7 +384,7 @@
                         </b-row>   
                         <b-row>
                             <!-- CATEGORIES -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Categories"
                                     label-cols-sm="4"
@@ -391,14 +399,14 @@
                                             type="search"
                                             id="categories"
                                             placeholder="Type to Search"
-                                            @change="search()"
+                                            @change="populateParams()"
                                         >
                                         </b-form-input>
                                     </b-input-group>
                                 </b-form-group>
                             </b-col>
                             <!-- TAGS -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Tags"
                                     label-cols-sm="4"
@@ -413,14 +421,14 @@
                                             type="search"
                                             id="tags"
                                             placeholder="Type to Search"
-                                            @change="search()"
+                                            @change="populateParams()"
                                         >
                                         </b-form-input>
                                     </b-input-group>
                                 </b-form-group>
                             </b-col>
                             <!-- PAGE SIZE -->
-                            <b-col lg="4" class="my-1">
+                            <b-col xs="4" class="my-1">
                                 <b-form-group
                                     label="Page Size"
                                     label-cols-sm="5"
@@ -435,7 +443,31 @@
                                             type="number"
                                             id="pageSize"
                                             placeholder="Type to Search"
-                                            @input="search()"
+                                            @input="populateParams()"
+                                        >
+                                        </b-form-input>
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                        </b-row>
+                        <b-row>
+                            <!-- LIMIT -->
+                            <b-col lg="4" xs="4" class="my-1 offset-xs-8 offset-lg-8">
+                                <b-form-group
+                                    label="Limit"
+                                    label-cols-sm="5"
+                                    label-align-sm="left"
+                                    label-size="sm"
+                                    label-for="limit"
+                                    class="mb-0"
+                                >
+                                    <b-input-group size="sm">
+                                        <b-form-input
+                                            v-model="params.limit"
+                                            type="number"
+                                            id="limit"
+                                            placeholder="Type to Search"
+                                            @input="populateParams()"
                                         >
                                         </b-form-input>
                                     </b-input-group>
@@ -446,7 +478,7 @@
                         <hr/>
                         
                         <b-row>
-                            <b-col lg="3" class="my-1">
+                            <b-col xs="3" class="my-1">
                                 <b-form-group
                                     label="Sort Pid"
                                     label-cols-sm="7"
@@ -461,7 +493,7 @@
                                             size="sm"
                                             id="sortPid"
                                             class="w-15"
-                                            @input="search()"
+                                            @input="populateParams()"
                                         >
                                             <option :value="1">Asc</option>
                                             <option :value="-1">Desc</option>
@@ -469,7 +501,7 @@
                                     </b-input-group>
                                 </b-form-group>
                             </b-col> 
-                            <b-col lg="3" class="my-1">
+                            <b-col xs="3" class="my-1">
                                 <b-form-group
                                     label="Sort Start Time"
                                     label-cols-sm="7"
@@ -484,7 +516,7 @@
                                             size="sm"
                                             id="sortStartTime"
                                             class="w-25"
-                                            @input="search()"
+                                            @input="populateParams()"
                                         >
                                             <option :value="1">Asc</option>
                                             <option :value="-1">Desc</option>
@@ -492,7 +524,7 @@
                                     </b-input-group>
                                 </b-form-group>    
                             </b-col>
-                            <b-col lg="3" class="my-1">
+                            <b-col xs="3" class="my-1">
                                 <b-form-group
                                     label="Sort End Time"
                                     label-cols-sm="7"
@@ -507,7 +539,7 @@
                                             size="sm"
                                             id="sortEndTime"
                                             class="w-25"
-                                            @input="search()"
+                                            @input="populateParams()"
                                         >
                                             <option :value="1">Asc</option>
                                             <option :value="-1">Desc</option>
@@ -515,7 +547,7 @@
                                     </b-input-group>
                                 </b-form-group>    
                             </b-col>
-                            <b-col lg="3" class="my-1">
+                            <b-col xs="3" class="my-1">
                                 <b-form-group
                                     label="Sort Epoch Start Time"
                                     label-cols-sm="7"
@@ -530,7 +562,7 @@
                                             size="sm"
                                             id="sortEpochStartTime"
                                             class="w-25"
-                                            @input="search()"
+                                            @input="populateParams()"
                                         >
                                             <option :value="1">Asc</option>
                                             <option :value="-1">Desc</option>
@@ -540,7 +572,7 @@
                             </b-col>                        
                         </b-row>
                         <b-row>
-                            <b-col lg="3" class="my-1">
+                            <b-col xs="3" class="my-1">
                                 <b-form-group
                                     label="Sort Epoch End Time"
                                     label-cols-sm="7"
@@ -555,7 +587,7 @@
                                             size="sm"
                                             id="sortEpochEnd"
                                             class="w-15"
-                                            @input="search()"
+                                            @input="populateParams()"
                                         >
                                             <option :value="1">Asc</option>
                                             <option :value="-1">Desc</option>
@@ -563,7 +595,7 @@
                                     </b-input-group>
                                 </b-form-group>
                             </b-col> 
-                            <b-col lg="3" class="my-1">
+                            <b-col xs="3" class="my-1">
                                 <b-form-group
                                     label="Sort Complete Title"
                                     label-cols-sm="7"
@@ -578,7 +610,7 @@
                                             size="sm"
                                             id="sortCompleteTitle"
                                             class="w-15"
-                                            @input="search()"
+                                            @input="populateParams()"
                                         >
                                             <option :value="1">Asc</option>
                                             <option :value="-1">Desc</option>
@@ -586,7 +618,7 @@
                                     </b-input-group>
                                 </b-form-group> 
                             </b-col>
-                            <b-col lg="3" class="my-1">
+                            <b-col xs="3" class="my-1">
                                 <b-form-group
                                     label="Sort Media Type"
                                     label-cols-sm="7"
@@ -601,7 +633,7 @@
                                             size="sm"
                                             id="sortMediaType"
                                             class="w-25"
-                                            @input="search()"
+                                            @input="populateParams()"
                                         >
                                             <option :value="1">Asc</option>
                                             <option :value="-1">Desc</option>
@@ -609,7 +641,7 @@
                                     </b-input-group>
                                 </b-form-group>    
                             </b-col>
-                            <b-col lg="3" class="my-1">
+                            <b-col xs="3" class="my-1">
                                 <b-form-group
                                     label="Sort Masterbrand"
                                     label-cols-sm="7"
@@ -624,7 +656,7 @@
                                             size="sm"
                                             id="sortMasterbrand"
                                             class="w-25"
-                                            @input="search()"
+                                            @input="populateParams()"
                                         >
                                             <option :value="1">Asc</option>
                                             <option :value="-1">Desc</option>
@@ -634,7 +666,7 @@
                             </b-col>                        
                         </b-row>
                         <b-row>
-                            <b-col lg="3" class="my-1">
+                            <b-col xs="3" class="my-1">
                                 <b-form-group
                                     label="Sort Service"
                                     label-cols-sm="7"
@@ -649,7 +681,7 @@
                                             size="sm"
                                             id="sortService"
                                             class="w-15"
-                                            @input="search()"
+                                            @input="populateParams()"
                                         >
                                             <option :value="1">Asc</option>
                                             <option :value="-1">Desc</option>
@@ -657,7 +689,7 @@
                                     </b-input-group>
                                 </b-form-group>
                             </b-col> 
-                            <b-col lg="3" class="my-1">
+                            <b-col xs="3" class="my-1">
                                 <b-form-group
                                     label="Sort Brand Pid"
                                     label-cols-sm="7"
@@ -672,7 +704,7 @@
                                             size="sm"
                                             id="sortBrandPid"
                                             class="w-25"
-                                            @input="search()"
+                                            @input="populateParams()"
                                         >
                                             <option :value="1">Asc</option>
                                             <option :value="-1">Desc</option>
@@ -680,7 +712,7 @@
                                     </b-input-group>
                                 </b-form-group>    
                             </b-col>
-                            <b-col lg="3" class="my-1">
+                            <b-col xs="3" class="my-1">
                                 <b-form-group
                                     label="Sort Is Clip"
                                     label-cols-sm="7"
@@ -695,7 +727,7 @@
                                             size="sm"
                                             id="sortIsClip"
                                             class="w-25"
-                                            @input="search()"
+                                            @input="populateParams()"
                                         >
                                             <option :value="1">Asc</option>
                                             <option :value="-1">Desc</option>
@@ -703,7 +735,7 @@
                                     </b-input-group>
                                 </b-form-group>    
                             </b-col>
-                            <b-col lg="3" class="my-1">
+                            <b-col xs="3" class="my-1">
                                 <b-form-group
                                     label="Sort Categories"
                                     label-cols-sm="7"
@@ -718,7 +750,7 @@
                                             size="sm"
                                             id="sortCategories"
                                             class="w-25"
-                                            @input="search()"
+                                            @input="populateParams()"
                                         >
                                             <option :value="1">Asc</option>
                                             <option :value="-1">Desc</option>
@@ -726,108 +758,120 @@
                                     </b-input-group>
                                 </b-form-group>    
                             </b-col>       
-                            <b-col lg="3" class="my-1">
-                                <b-form-group
-                                    label="Sort Tags"
-                                    label-cols-sm="7"
-                                    label-align-sm="left"
-                                    label-size="sm"
-                                    label-for="sortTags"
-                                    class="mb-0"
-                                >
-                                    <b-input-group size="xs">
-                                        <b-form-select 
-                                            v-model="params.order_tags"
-                                            size="sm"
-                                            id="sortTags"
-                                            class="w-25"
-                                            @input="search()"
-                                        >
-                                            <option :value="1">Asc</option>
-                                            <option :value="-1">Desc</option>
-                                        </b-form-select>
-                                    </b-input-group>
-                                </b-form-group>
-                            </b-col>                 
-                        </b-row>    
+                        </b-row>
+                        <b-row>
+                        <b-col lg="3" xs="3" class="my-1 offset-xs-9 offset-lg-9">
+                            <b-form-group
+                                label="Sort Tags"
+                                label-cols-sm="7"
+                                label-align-sm="left"
+                                label-size="sm"
+                                label-for="sortTags"
+                                class="mb-0"
+                            >
+                                <b-input-group size="xs">
+                                    <b-form-select 
+                                        v-model="params.order_tags"
+                                        size="sm"
+                                        id="sortTags"
+                                        class="w-25"
+                                        @input="populateParams()"
+                                    >
+                                        <option :value="1">Asc</option>
+                                        <option :value="-1">Desc</option>
+                                    </b-form-select>
+                                </b-input-group>
+                            </b-form-group>
+                        </b-col>                 
+                        </b-row>
+                            
                         
                         <hr/>
                         
                         <!-- ToDo: add checkboxes to disable columns -->
 
-                        <b-form-group label="Show/Hide Columns">
+                        <b-form-group label="Show/Hide Columns" class="my-0">
                             <b-row>
-                                <b-col lg="2" class="my-1">
+                                <b-col xs="2" class="my-1">
                                     <b-form-checkbox id="columnPid" v-model="showColumns.pid" value="1" @change="toggleColumn(toggle.pid)">
                                         Pid
                                     </b-form-checkbox>  
                                 </b-col>
-                                <b-col lg="2" class="my-1">
+                                <b-col xs="2" class="my-1">
                                     <b-form-checkbox id="columnStartTime" v-model="showColumns.startTime" value="1" @change="toggleColumn(toggle.startTime)">
                                         Start Time
                                     </b-form-checkbox>
                                 </b-col>
-                                <b-col lg="2" class="my-1">
+                                <b-col xs="2" class="my-1">
                                     <b-form-checkbox id="columnEndTime" v-model="showColumns.endTime" value="1" @change="toggleColumn(toggle.endTime)">
                                         End Time
                                     </b-form-checkbox>
                                 </b-col>
-                                <b-col lg="2" class="my-1">
+                                <b-col xs="2" class="my-1">
                                     <b-form-checkbox id="columnEpochStart" v-model="showColumns.epochStart" value="1" @change="toggleColumn(toggle.epochStart)">
                                         Epoch Start
                                     </b-form-checkbox>         
                                 </b-col>
-                                <b-col lg="2" class="my-1">                                                                        
+                                <b-col xs="2" class="my-1">                                                                        
                                     <b-form-checkbox id="columnEpochEnd" v-model="showColumns.epochEnd" value="1" @change="toggleColumn(toggle.epochEnd)">
                                         Epoch End
                                     </b-form-checkbox>   
                                 </b-col> 
-                                <b-col lg="2" class="my-1">
+                                <b-col xs="2" class="my-1">
                                     <b-form-checkbox id="columnCompleteTitle" v-model="showColumns.completeTitle" value="1" @change="toggleColumn(toggle.completeTitle)">
                                         Complete Title
                                     </b-form-checkbox>       
                                 </b-col>
                             </b-row>
                             <b-row>
-                                <b-col lg="2" class="my-1">
+                                <b-col xs="2" class="my-1">
                                     <b-form-checkbox id="columnMediaType" v-model="showColumns.mediaType" value="1" @change="toggleColumn(toggle.mediaType)">
                                         Media Type
                                     </b-form-checkbox>
                                 </b-col>
-                                <b-col lg="2" class="my-1">
+                                <b-col xs="2" class="my-1">
                                     <b-form-checkbox id="columnMasterbrand" v-model="showColumns.masterbrand" value="1" @change="toggleColumn(toggle.masterbrand)">
                                         Masterbrand
                                     </b-form-checkbox>
                                 </b-col>
-                                <b-col lg="2" class="my-1">
+                                <b-col xs="2" class="my-1">
                                     <b-form-checkbox id="columnService" v-model="showColumns.service" value="1" @change="toggleColumn(toggle.service)">
                                         Service
                                     </b-form-checkbox>
                                 </b-col>
-                                <b-col lg="2" class="my-1">
+                                <b-col xs="2" class="my-1">
                                     <b-form-checkbox id="columnBrandPid" v-model="showColumns.brandPid" value="1" @change="toggleColumn(toggle.brandPid)">
                                         Brand Pid
                                     </b-form-checkbox>
                                 </b-col>
-                                <b-col lg="2" class="my-1">
+                                <b-col xs="2" class="my-1">
                                     <b-form-checkbox id="columnIsClip" v-model="showColumns.isClip" value="1" @change="toggleColumn(toggle.isClip)">
                                         Is Clip
                                     </b-form-checkbox>
                                 </b-col>
-                                <b-col lg="2" class="my-1">
+                                <b-col xs="2" class="my-1">
                                     <b-form-checkbox id="columnCategories" v-model="showColumns.categories" value="1" @change="toggleColumn(toggle.categories)">
                                         Categories
                                     </b-form-checkbox>
                                 </b-col>
                             </b-row>
                             <b-row>
-                                <b-col lg="2" class="my-1">
+                                <b-col lg="2" xs="2" class="my-1 offset-lg-10 offset-xs-10">
                                     <b-form-checkbox id="columnTags" v-model="showColumns.tags" value="1" @change="toggleColumn(toggle.tags)">
                                         Tags
                                     </b-form-checkbox>
                                 </b-col>
-                            </b-row>                 
+                            </b-row>
+
+                            <hr/>
+
                         </b-form-group>
+                        
+                        <b-row>
+                            <b-col xs="2" class=" offset-xs-10">
+                                <b-button variant="primary" class="float-right" @click="search()">Search</b-button>
+                            </b-col>
+                        </b-row>                 
 
                     </b-card>
                 </b-collapse>
@@ -837,24 +881,25 @@
                     <b-table 
                         striped
                         responsive 
+                        bordered	
                         hover 
                         :fields="fields" 
                         :items="results"
+                        :per-page="params.page_size"
+                        :current-page="params.page_number"
                     >
                     </b-table>
-                    <!-- ToDo: Search for null values -->
-                    <!-- ToDo: display just 5 results per page -->
+                    
                     <div :class="[this.paginationIsShown ? '' : 'd-none']">
-                        <b-col lg=12 class="my-1">
+                        <b-col xs=12 class="my-1">
                             <b-pagination
                                 v-model="params.page_number"
-                                :total-rows="totalRows"
+                                :total-rows="params.limit"
                                 :per-page="params.page_size"
                                 align="center"
                                 size="md"
                                 limit="10"
                                 class="my-0"
-                                @input="newPage"
                             ></b-pagination>
                         </b-col>
                     </div>
@@ -896,7 +941,7 @@
                     pid:"",start_time_from:"",start_time_to:"",end_time_from:"",
                     end_time_to:"",epoch_start_from:"",epoch_start_to:"",epoch_end_from:"",
                     epoch_end_to:"",complete_title:"",media_type:"",masterbrand:"",service:"",
-                    brand_pid:"",is_clip:"",categories:"",tags:"",page_size:5,page_number: 1,
+                    brand_pid:"",is_clip:"",categories:"",tags:"",page_size:10,page_number: 1, limit:100,
                     
                     // for ordering
                     order_pid:"",order_end_time:"",order_start_time:"",order_epoch_end:"",
@@ -967,7 +1012,7 @@
                 toUnixEpoch(date, paramName) {
                     date == null ? date = "" : date = new Date(date).getTime()/1000
                     this.params[paramName] = date.toString()
-                    this.search()
+                    this.populateParams()
                 },
                 toggleColumn(index) {
                         let column = document.querySelectorAll(`[aria-colindex='${index}']`)
